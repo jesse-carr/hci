@@ -40,7 +40,16 @@
                 <div id="world-map" class="map-graph" role="region" aria-label="World choropleth map of emissions severity"></div>
                 <div style="padding: 10px 0;">
                     <label for="year-slider" class="visually-hidden" style="display:none;">Year selector for map</label>
-                    <input type="range" id="year-slider" min="1992" max="2018" step="0.1" value="1992" style="width: 100%; accent-color: var(--accent);" oninput="onYearChange(parseFloat(this.value))" aria-label="Year slider for map">
+                    <input type="range" id="year-slider" min="1992" max="2018" step="0.1" value="1992" list="map-year-intervals" style="width: 100%; accent-color: var(--accent);" oninput="onYearChange(parseFloat(this.value))" aria-label="Year slider for map">
+                    <datalist id="map-year-intervals">
+                        <option value="1992" label="1992"></option>
+                        <option value="1995" label="1995"></option>
+                        <option value="2000" label="2000"></option>
+                        <option value="2005" label="2005"></option>
+                        <option value="2010" label="2010"></option>
+                        <option value="2015" label="2015"></option>
+                        <option value="2018" label="2018"></option>
+                    </datalist>
                 </div>
                 <div class="map-note">Combined severity = CO2 total + N2O + CH4. Countries without a value for the selected year are not selectable.</div>
             </section>
@@ -90,7 +99,16 @@
                         <span style="font: 500 11px 'DM Mono', monospace; color: var(--muted);" aria-hidden="true">YEAR:</span>
                         <span id="area-year-label" class="area-year-readout" aria-live="polite">1992</span>
                         <label for="area-year-slider" class="visually-hidden" style="display:none;">Year slider for global share breakdown</label>
-                        <input type="range" id="area-year-slider" min="1992" max="2018" step="1" value="1992" style="width: 140px; accent-color: var(--green);" oninput="onAreaYearChange(parseInt(this.value))" aria-label="Year selector for global share chart">
+                        <input type="range" id="area-year-slider" min="1992" max="2018" step="1" value="1992" list="area-year-intervals" style="width: 140px; accent-color: var(--green);" oninput="onAreaYearChange(parseInt(this.value))" aria-label="Year selector for global share chart">
+                        <datalist id="area-year-intervals">
+                            <option value="1992" label="1992"></option>
+                            <option value="1995" label="1995"></option>
+                            <option value="2000" label="2000"></option>
+                            <option value="2005" label="2005"></option>
+                            <option value="2010" label="2010"></option>
+                            <option value="2015" label="2015"></option>
+                            <option value="2018" label="2018"></option>
+                        </datalist>
                     </div>
                 </div>
                 <div id="area-graph-wrapper" style="width: 100%; display: flex; justify-content: center;">
