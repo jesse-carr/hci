@@ -8,21 +8,13 @@
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .area-panel { grid-column: 1 / -1; padding: 24px 26px 20px; background: #ffffff; border: 1px solid var(--line); border-radius: 4px; }
-        .area-header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
-        .area-controls { display: flex; align-items: center; gap: 14px; }
-        .area-year-readout { font: 600 22px 'Space Grotesk', sans-serif; color: var(--green); min-width: 60px; text-align: right; }
-        .area-graph { height: 420px; width: 100%; }
-        .owid-subtitle { font-size: 12px; color: var(--muted); margin-top: 3px; font-style: italic; }
-    </style>
 </head>
 <body>
     <div class="app-shell">
-        <header class="topbar">
+        <header class="topbar" role="banner">
             <div class="brand">
                 <div>
-                    <div class="eyebrow">CLIMATE DATA / EXPLORER</div>
+                    <div class="eyebrow" aria-hidden="true">CLIMATE DATA / EXPLORER</div>
                     <h1>Global emissions</h1>
                 </div>
             </div>
@@ -32,71 +24,82 @@
             </div>
         </header>
 
-        <main class="dashboard-grid">
+        <main class="dashboard-grid" role="main">
             <!-- Panel 1: Map -->
-            <section class="panel map-panel">
+            <section class="panel map-panel" aria-labelledby="map-heading-title">
                 <div class="panel-heading map-heading">
                     <div>
-                        <div class="eyebrow">01 / GEOGRAPHY</div>
-                        <h2>Emissions by country</h2>
+                        <div class="eyebrow" aria-hidden="true">01 / GEOGRAPHY</div>
+                        <h2 id="map-heading-title">Emissions by country</h2>
                     </div>
                     <div class="map-controls-top">
-                        <span id="year-label" class="year-readout">1992.0</span>
-                        <button id="play-button" class="play-button" onclick="togglePlay()">▶  Play</button>
+                        <span id="year-label" class="year-readout" aria-live="polite">1992.0</span>
+                        <button id="play-button" class="play-button" onclick="togglePlay()" aria-label="Play or pause map year animation">▶  Play</button>
                     </div>
                 </div>
-                <div id="world-map" class="map-graph"></div>
+                <div id="world-map" class="map-graph" role="region" aria-label="World choropleth map of emissions severity"></div>
                 <div style="padding: 10px 0;">
-                    <input type="range" id="year-slider" min="1992" max="2018" step="0.1" value="1992" style="width: 100%; accent-color: var(--accent);" oninput="onYearChange(parseFloat(this.value))">
+                    <label for="year-slider" class="visually-hidden" style="display:none;">Year selector for map</label>
+                    <input type="range" id="year-slider" min="1992" max="2018" step="0.1" value="1992" style="width: 100%; accent-color: var(--accent);" oninput="onYearChange(parseFloat(this.value))" aria-label="Year slider for map">
                 </div>
                 <div class="map-note">Combined severity = CO2 total + N2O + CH4. Countries without a value for the selected year are not selectable.</div>
             </section>
 
             <!-- Panel 2: Country Detail -->
-            <section class="panel detail-panel">
+            <section class="panel detail-panel" aria-labelledby="detail-heading-title">
                 <div class="panel-heading">
-                    <div class="eyebrow">02 / COUNTRY PROFILE</div>
-                    <h2>Specified country</h2>
+                    <div class="eyebrow" aria-hidden="true">02 / COUNTRY PROFILE</div>
+                    <h2 id="detail-heading-title">Specified country</h2>
                 </div>
-                <div id="country-detail" class="country-detail">
+                <div id="country-detail" class="country-detail" aria-live="polite">
                     <div class="empty-detail">
-                        <div class="detail-placeholder-mark">—</div>
+                        <div class="detail-placeholder-mark" aria-hidden="true">—</div>
                         <p>Hover a country on the map to inspect its profile and emissions history.</p>
                     </div>
                 </div>
             </section>
 
             <!-- Panel 3: Time Series -->
-            <section class="panel chart-panel">
+            <section class="panel chart-panel" aria-labelledby="chart-heading-title">
                 <div class="panel-heading chart-heading">
                     <div>
-                        <div class="eyebrow">03 / TIME SERIES</div>
-                        <h2>Historical emissions mix</h2>
+                        <div class="eyebrow" aria-hidden="true">03 / TIME SERIES</div>
+                        <h2 id="chart-heading-title">Historical emissions mix</h2>
                     </div>
-                    <div id="chart-country-label" class="chart-country-label">Hover a country to preview its history</div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <button class="reset-btn" onclick="resetHistoryChart()" aria-label="Reset historical emissions chart traces">Reset Chart</button>
+                        <div id="chart-country-label" class="chart-country-label" aria-live="polite">Hover a country to preview its history</div>
+                    </div>
                 </div>
-                <div id="history-chart" class="history-graph"></div>
+                <div id="history-graph-wrapper" style="width: 100%; display: flex; justify-content: center;">
+                    <div id="history-chart" class="history-graph" role="region" aria-label="Historical emissions stacked bar chart"></div>
+                </div>
             </section>
 
-            <!-- Panel 4: OWID-Style Stacked Area / Distribution Chart -->
-            <section class="area-panel">
+            <!-- Panel 4: Stacked Area / Distribution Chart -->
+            <section class="area-panel" aria-labelledby="area-heading-title">
                 <div class="area-header-row">
                     <div>
-                        <div class="eyebrow">04 / GLOBAL SHARE BREAKDOWN</div>
-                        <h2>Global CO2 Share by Fuel Type (Top 10 Emitting Countries)</h2>
+                        <div class="eyebrow" aria-hidden="true">04 / GLOBAL SHARE BREAKDOWN</div>
+                        <h2 id="area-heading-title">Global CO2 Share by Fuel Type (Top 10 Emitting Countries)</h2>
                         <div class="owid-subtitle">Stacked distribution across fossil fuels and cement production for the selected year.</div>
                     </div>
                     <div class="area-controls">
-                        <span style="font: 500 11px 'DM Mono', monospace; color: var(--muted);">YEAR:</span>
-                        <span id="area-year-label" class="area-year-readout">1992</span>
-                        <input type="range" id="area-year-slider" min="1992" max="2018" step="1" value="1992" style="width: 160px; accent-color: var(--green);" oninput="onAreaYearChange(parseInt(this.value))">
+                        <button id="area-play-button" class="play-button" onclick="toggleAreaPlay()" aria-label="Play or pause global share year animation">▶  Play</button>
+                        <button class="reset-btn" onclick="resetAreaChart()" aria-label="Reset global share chart to 1992">Reset Chart</button>
+                        <span style="font: 500 11px 'DM Mono', monospace; color: var(--muted);" aria-hidden="true">YEAR:</span>
+                        <span id="area-year-label" class="area-year-readout" aria-live="polite">1992</span>
+                        <label for="area-year-slider" class="visually-hidden" style="display:none;">Year slider for global share breakdown</label>
+                        <input type="range" id="area-year-slider" min="1992" max="2018" step="1" value="1992" style="width: 140px; accent-color: var(--green);" oninput="onAreaYearChange(parseInt(this.value))" aria-label="Year selector for global share chart">
                     </div>
                 </div>
-                <div id="area-chart" class="area-graph"></div>
+                <div id="area-graph-wrapper" style="width: 100%; display: flex; justify-content: center;">
+                    <div id="area-chart" class="area-graph" role="region" aria-label="Global CO2 share stacked area chart"></div>
+                </div>
             </section>
         </main>
 
-        <footer class="footer">SOURCE FILE  global_emissions.csv   ·   COUNTRY GEOMETRY  ISO-3</footer>
+        <footer class="footer" role="contentinfo">SOURCE FILE  global_emissions.csv   ·   COUNTRY GEOMETRY  ISO-3</footer>
     </div>
 
     <script>
@@ -107,6 +110,8 @@
         let hoveredCountry = null;
         let isPlaying = false;
         let playInterval = null;
+        let isAreaPlaying = false;
+        let areaPlayInterval = null;
         let maxSeverityValue = 16000;
 
         const STACK_COLUMNS = [
@@ -126,8 +131,7 @@
             "Emissions.Global Share.CO2.Flaring"
         ];
         const SHARE_LABELS = ["Cement", "Coal", "Gas", "Oil", "Flaring"];
-        // OWID-inspired rich cohesive palette
-        const SHARE_COLORS = ["#94a3b8", "#1e293b", "#0ea5e9", "#f97316", "#eab308"];
+        const SHARE_COLORS = ["#64748b", "#0f172a", "#0284c7", "#ea580c", "#ca8a04"];
 
         // Load CSV data
         Papa.parse("global_emissions.csv", {
@@ -305,11 +309,25 @@
             }
         }
 
+        function toggleAreaPlay() {
+            isAreaPlaying = !isAreaPlaying;
+            let btn = document.getElementById('area-play-button');
+            btn.innerHTML = isAreaPlaying ? "Ⅱ  Pause" : "▶  Play";
+            if (isAreaPlaying) {
+                areaPlayInterval = setInterval(() => {
+                    currentAreaYear = currentAreaYear >= 2018 ? 1992 : currentAreaYear + 1;
+                    onAreaYearChange(currentAreaYear);
+                }, 800);
+            } else {
+                clearInterval(areaPlayInterval);
+            }
+        }
+
         function updateCountryDetail() {
             let activeCode = lockedCountry || hoveredCountry;
             let container = document.getElementById('country-detail');
             if (!activeCode) {
-                container.innerHTML = `<div class="empty-detail"><div class="detail-placeholder-mark">—</div><p>Hover a country on the map to inspect its profile and emissions history.</p></div>`;
+                container.innerHTML = `<div class="empty-detail"><div class="detail-placeholder-mark" aria-hidden="true">—</div><p>Hover a country on the map to inspect its profile and emissions history.</p></div>`;
                 return;
             }
 
@@ -356,13 +374,26 @@
         function updateHistoryChart() {
             let activeCode = lockedCountry || hoveredCountry;
             let labelDiv = document.getElementById('chart-country-label');
+            
             if (!activeCode) {
                 labelDiv.innerText = "Hover a country to preview its history";
-                Plotly.purge('history-chart');
+                Plotly.newPlot('history-chart', [], {
+                    xaxis: { visible: false, fixedrange: true },
+                    yaxis: { visible: false, fixedrange: true },
+                    annotations: [{
+                        text: "Hover or click a country on the map above to view its historical emissions mix.",
+                        xref: "paper", yref: "paper",
+                        x: 0.5, y: 0.5, showarrow: false,
+                        font: { size: 14, color: "#718078", family: "'IBM Plex Sans', sans-serif" }
+                    }],
+                    paper_bgcolor: "rgba(0,0,0,0)",
+                    plot_bgcolor: "rgba(0,0,0,0)",
+                    margin: { l: 20, r: 20, t: 20, b: 20 }
+                }, { displayModeBar: false });
                 return;
             }
 
-            let countryRows = rawData.filter(d => d["Country.Code"] === activeCode).sort((a,b) => a.Year - b.Year);
+            let countryRows = rawData.filter(d => d["Country.Code"] == activeCode).sort((a,b) => a.Year - b.Year);
             if (!countryRows.length) return;
 
             labelDiv.innerText = `${countryRows[0]["Country.Name"]} · ${activeCode}`;
@@ -379,18 +410,28 @@
 
             let layout = {
                 barmode: 'stack',
-                margin: { l: 52, r: 14, t: 8, b: 68 },
+                margin: { l: 65, r: 20, t: 10, b: 85 },
                 paper_bgcolor: "rgba(0,0,0,0)",
                 plot_bgcolor: "rgba(0,0,0,0)",
-                font: { family: "'IBM Plex Sans', sans-serif", color: "#52615c", size: 11 },
+                font: { family: "'IBM Plex Sans', sans-serif", color: "#182724", size: 12 },
                 hovermode: 'x unified',
-                legend: { orientation: 'h', y: -0.31, x: 0, font: { size: 10 } },
-                xaxis: { tickangle: -45, showgrid: false, fixedrange: true },
-                yaxis: { title: "Emissions (dataset units)", rangemode: 'tozero', gridcolor: "#e4e9e6", zerolinecolor: "#cfd8d3", fixedrange: true },
+                legend: { orientation: 'h', y: -0.36, x: 0.5, xanchor: 'center', font: { size: 13 } },
+                xaxis: { title: { text: "Year", font: { size: 13, weight: 600 } }, tickmode: "array", tickvals: years.filter((_, i) => i % 2 === 0), tickangle: -35, showgrid: false, fixedrange: true },
+                yaxis: { title: { text: "Emissions (dataset units)", font: { size: 13, weight: 600 } }, rangemode: 'tozero', gridcolor: "#e4e9e6", zerolinecolor: "#cfd8d3", fixedrange: true },
                 bargap: 0.16
             };
 
             Plotly.react('history-chart', traces, layout, { displayModeBar: false });
+        }
+
+        function resetHistoryChart() {
+            let historyDiv = document.getElementById('history-chart');
+            if (historyDiv && historyDiv.data && historyDiv.data.length > 0) {
+                let indices = historyDiv.data.map((_, i) => i);
+                Plotly.restyle('history-chart', { visible: true }, indices);
+            } else {
+                updateHistoryChart();
+            }
         }
 
         function onAreaYearChange(year) {
@@ -400,15 +441,21 @@
             updateAreaChart();
         }
 
+        function resetAreaChart() {
+            if (isAreaPlaying) toggleAreaPlay();
+            currentAreaYear = 1992;
+            document.getElementById('area-year-label').innerText = "1992";
+            document.getElementById('area-year-slider').value = 1992;
+            updateAreaChart();
+        }
+
         function updateAreaChart() {
             let yearRows = rawData.filter(d => d.Year === currentAreaYear);
-            // Sort by total global share descending and take top 10
             yearRows.sort((a, b) => b.TotalShare - a.TotalShare);
             let top10 = yearRows.slice(0, 10);
 
             let countries = top10.map(d => d["Country.Name"]);
 
-            // Render as smooth stacked area / filled curves (OWID style)
             let traces = SHARE_COLUMNS.map((col, idx) => ({
                 x: countries,
                 y: top10.map(d => d[col] || 0),
@@ -423,14 +470,14 @@
             }));
 
             let layout = {
-                margin: { l: 50, r: 20, t: 20, b: 60 },
+                margin: { l: 65, r: 25, t: 20, b: 85 },
                 paper_bgcolor: "rgba(0,0,0,0)",
                 plot_bgcolor: "rgba(0,0,0,0)",
-                font: { family: "'IBM Plex Sans', sans-serif", color: "#52615c", size: 11 },
+                font: { family: "'IBM Plex Sans', sans-serif", color: "#182724", size: 12 },
                 hovermode: 'x unified',
-                legend: { orientation: 'h', y: -0.22, x: 0, font: { size: 11 } },
-                xaxis: { tickangle: -20, showgrid: false, fixedrange: true, zeroline: false },
-                yaxis: { title: "Cumulative Global Share (%)", rangemode: 'tozero', gridcolor: "#e4e9e6", zerolinecolor: "#cfd8d3", fixedrange: true }
+                legend: { orientation: 'h', y: -0.32, x: 0.5, xanchor: 'center', font: { size: 13 } },
+                xaxis: { title: { text: "Top 10 Emitting Countries", font: { size: 13, weight: 600 } }, tickangle: -20, showgrid: false, fixedrange: true, zeroline: false },
+                yaxis: { title: { text: "Cumulative Global Share (%)", font: { size: 13, weight: 600 } }, rangemode: 'tozero', gridcolor: "#e4e9e6", zerolinecolor: "#cfd8d3", fixedrange: true }
             };
 
             Plotly.react('area-chart', traces, layout, { displayModeBar: false });
